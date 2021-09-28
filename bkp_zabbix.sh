@@ -14,10 +14,14 @@ DB_USER=$(sed -n -e 's/^DB_USER=//p' <<< "$(cat /root/dadosDB)")
 DB_PASS=$(sed -n -e 's/^DB_PASS=//p' <<< "$(cat /root/dadosDB)")
 DB_NAME=$(sed -n -e 's/^DB_NAME=//p' <<< "$(cat /root/dadosDB)")
 
-# Dump da estrutura (Schema)
-mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" >/root/backup/bkp_$DB_NAME-schema-$DATA.sql
+# Diretorio que armazena o backup e diretorio de config do Zabbix
+BKP_DIR="/root/backup"
+CONF_DIR="/etc/zabbix"
 
-# Dump dos dados no banco de dados
+# Dump da estrutura (Schema) e joga na pasta de backup
+mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" >$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql
+
+# Dump dos dados no banco de dados e joga na pasta de backup
 # Manual: https://mariadb.com/kb/en/mysqldump/
 
 mysqldump -alv -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables -t -n -e -B \
@@ -41,10 +45,14 @@ mysqldump -alv -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-
     --ignore-table="$DB_NAME.proxy_dhistory" \
     --ignore-table="$DB_NAME.trends" \
     --ignore-table="$DB_NAME.trends_uint" \
-    >/root/backup/bkp_$DB_NAME-$DATA.sql
+    >$BKP_DIR/bkp_$DB_NAME-$DATA.sql
 # Fim do dump
 
-# 1. Compacta o arquivo 2. -C diz onde o arquivo será criado 3. Compacta o arquivo SQL
-tar -cvf /root/backup/bkp_$DB_NAME-$DATA.tar -C /root/backup/ bkp_$DB_NAME-$DATA.sql
-tar -cvf /root/backup/bkp_$DB_NAME-schema-$DATA.tar -C /root/backup/ bkp_$DB_NAME-schema-$DATA.sql
+# 1. Tar compacta e nomeia o arquivo; 
+# 2. -C diz onde o arquivo será criado; 
+# 3. Compacta o arquivo SQL; 
+
+tar -cvf $BKP_DIR/bkp_$DB_NAME-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-$DATA.sql
+tar -cvf $BKP_DIR/bkp_$DB_NAME-schema-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-schema-$DATA.sql
+tar -cvf $BKP_DIR/bkp_zabbix-config-$DATA.tar -C $BKP_DIR/ $CONF_DIR
 exit 0
