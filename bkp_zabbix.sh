@@ -16,7 +16,7 @@ DB_NAME=$(sed -n -e 's/^DB_NAME=//p' <<< "$(cat /root/dadosDB)")
 
 # Diretorio que armazena o backup e diretorio de config do Zabbix
 BKP_DIR="/root/backup"
-CONF_DIR="/etc/zabbix"
+CONF_DIR="/etc/zabbix /usr/lib/zabbix"
 
 # Dump da estrutura (Schema) e joga na pasta de backup
 mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" >$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql
@@ -46,6 +46,8 @@ mysqldump -alv -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-
     --ignore-table="$DB_NAME.trends" \
     --ignore-table="$DB_NAME.trends_uint" \
     >$BKP_DIR/bkp_$DB_NAME-$DATA.sql
+    2> $ERROR_LOG
+
 # Fim do dump
 
 # 1. Tar compacta e nomeia o arquivo; 
