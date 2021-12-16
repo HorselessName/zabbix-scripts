@@ -1,4 +1,4 @@
-# Crontab para backup automatico:
+# Crontab para backup automatico
 #
 # Todo domingo, meia noite
 # 0 0 * * 0 su - -c "/root/bkp_zabbix.sh > /dev/null 2> /dev/null"
