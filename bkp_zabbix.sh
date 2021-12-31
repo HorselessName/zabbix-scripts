@@ -24,7 +24,7 @@ mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" >$
 # Dump dos dados no banco de dados e joga na pasta de backup
 # Manual: https://mariadb.com/kb/en/mysqldump/
 
-mysqldump -alv -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables -t -n -e -B \
+mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables --routines --triggers --no-create-info --no-create-db \
     --ignore-table="$DB_NAME.acknowledges" \
     --ignore-table="$DB_NAME.alerts" \
     --ignore-table="$DB_NAME.auditlog" \
