@@ -19,12 +19,15 @@ BKP_DIR="/root/backup"
 CONF_DIR="/etc/zabbix /usr/lib/zabbix"
 
 # Dump da estrutura (Schema) e joga na pasta de backup
-mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" >$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql
+mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+    --skip-set-charset --default-character-set=utf8 \
+    >$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql
 
 # Dump dos dados no banco de dados e joga na pasta de backup
 # Manual: https://mariadb.com/kb/en/mysqldump/
 
 mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables --routines --triggers --no-create-info --no-create-db \
+    --skip-set-charset --default-character-set=utf8 \
     --ignore-table="$DB_NAME.acknowledges" \
     --ignore-table="$DB_NAME.alerts" \
     --ignore-table="$DB_NAME.auditlog" \
@@ -46,7 +49,7 @@ mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-
     --ignore-table="$DB_NAME.trends" \
     --ignore-table="$DB_NAME.trends_uint" \
     >$BKP_DIR/bkp_$DB_NAME-$DATA.sql
-    2> $ERROR_LOG
+    2>$BKP_DIR/ERROR_LOG
 
 # Fim do dump
 
