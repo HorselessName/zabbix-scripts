@@ -32,7 +32,9 @@ mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-
     --ignore-table="$DB_NAME.alerts" \
     --ignore-table="$DB_NAME.auditlog" \
     --ignore-table="$DB_NAME.auditlog_details" \
-    --ignore-table="$DB_NAME.escalations" \
+    --ignore-table="$DB_NAME.event_recovery" \
+    --ignore-table="$DB_NAME.event_suppress" \
+    --ignore-table="$DB_NAME.event_tag" \
     --ignore-table="$DB_NAME.events" \
     --ignore-table="$DB_NAME.history" \
     --ignore-table="$DB_NAME.history_log" \
@@ -42,10 +44,14 @@ mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-
     --ignore-table="$DB_NAME.history_text" \
     --ignore-table="$DB_NAME.history_uint" \
     --ignore-table="$DB_NAME.history_uint_sync" \
-    --ignore-table="$DB_NAME.dhosts" \
-    --ignore-table="$DB_NAME.dservices" \
-    --ignore-table="$DB_NAME.proxy_history" \
-    --ignore-table="$DB_NAME.proxy_dhistory" \
+    --ignore-table="$DB_NAME.problem" \
+    --ignore-table="$DB_NAME.problem_tag" \
+    --ignore-table="$DB_NAME.task" \
+    --ignore-table="$DB_NAME.task_acknowledge" \
+    --ignore-table="$DB_NAME.task_check_now" \
+    --ignore-table="$DB_NAME.task_close_problem" \
+    --ignore-table="$DB_NAME.task_remote_command" \
+    --ignore-table="$DB_NAME.task_remote_command_result" \
     --ignore-table="$DB_NAME.trends" \
     --ignore-table="$DB_NAME.trends_uint" \
     >$BKP_DIR/bkp_$DB_NAME-$DATA.sql
