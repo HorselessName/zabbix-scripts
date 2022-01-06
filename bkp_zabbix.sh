@@ -1,7 +1,7 @@
 # Crontab para backup automatico
 #
 # Todo domingo, meia noite
-# 0 0 * * 0 su - -c "/root/bkp_zabbix.sh > /dev/null 2> /dev/null"
+# 0 0 * * 0 su - -c "~/bkp_zabbix.sh > /dev/null 2> /dev/null"
 
 # Variaveis - Data, usuario, senha, nome do banco de dados.
 # Deve existir um arquivo dadosDB com os dados do banco
@@ -10,14 +10,17 @@ DATA=`date +%Y-%m-%d`
 # Pq usar aspas duplas: https://unix.stackexchange.com/a/68748/258344
 # Preservando line breaks ao enviar output p/ variavel: https://stackoverflow.com/a/22101842/8297745
 
-DB_USER=$(sed -n -e 's/^DB_USER=//p' <<< "$(cat /root/dadosDB)")
-DB_PASS=$(sed -n -e 's/^DB_PASS=//p' <<< "$(cat /root/dadosDB)")
-DB_NAME=$(sed -n -e 's/^DB_NAME=//p' <<< "$(cat /root/dadosDB)")
+# Inserir usuario, senha e banco que será feito o backup no arquivo especificado seguindo o padrão abaixo.
+
+DB_USER=$(sed -n -e 's/^DB_USER=//p' <<< "$(cat ~/dadosDB)")
+DB_PASS=$(sed -n -e 's/^DB_PASS=//p' <<< "$(cat ~/dadosDB)")
+DB_NAME=$(sed -n -e 's/^DB_NAME=//p' <<< "$(cat ~/dadosDB)")
 
 # Diretorio que armazena o backup e diretorio de config do Zabbix
-BKP_DIR="/root/backup"
+BKP_DIR="$HOME/backup"
 CONF_DIR="/etc/zabbix /usr/lib/zabbix"
 
+# Caso utilize o Zabbix em Docker, substituia a palavra 'mysqldump' por 'docker exec CONTAINER /usr/bin/mysqldump'
 # Dump da estrutura (Schema) e joga na pasta de backup
 mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
     --skip-set-charset --default-character-set=utf8 \
@@ -26,6 +29,7 @@ mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
 # Dump dos dados no banco de dados e joga na pasta de backup
 # Manual: https://mariadb.com/kb/en/mysqldump/
 
+# Caso utilize o Zabbix em Docker, substituia a palavra 'mysqldump' por 'docker exec CONTAINER /usr/bin/mysqldump'
 mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables --routines --triggers --no-create-info --no-create-db \
     --skip-set-charset --default-character-set=utf8 \
     --ignore-table="$DB_NAME.acknowledges" \
@@ -59,9 +63,9 @@ mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-
 
 # Fim do dump
 
-# 1. Tar compacta e nomeia o arquivo; 
-# 2. -C diz onde o arquivo será criado; 
-# 3. Compacta o arquivo SQL; 
+# 1. Tar compacta e nomeia o arquivo;
+# 2. -C diz onde o arquivo será criado;
+# 3. Compacta o arquivo SQL;
 
 tar -cvf $BKP_DIR/bkp_$DB_NAME-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-$DATA.sql
 tar -cvf $BKP_DIR/bkp_$DB_NAME-schema-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-schema-$DATA.sql
