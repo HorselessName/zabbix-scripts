@@ -1,6 +1,6 @@
 # Crontab:
 # Todo domingo, uma hora
-# 0 1 * * 0 su - -c "/root/copiar_para_onedrive.sh > /dev/null 2> /dev/null"
+# 0 1 * * 0 su - -c "~/copiar_para_onedrive.sh > /dev/null 2> /dev/null"
 
 # Enviar BKP local p/ OneDrive
 # Ferramenta utilizada: https://github.com/HorselessName/onedrive
