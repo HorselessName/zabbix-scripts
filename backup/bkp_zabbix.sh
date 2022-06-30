@@ -34,7 +34,7 @@ DB_NAME=$(sed -n -e 's/^DB_NAME=//p' <<< "$(cat /home/$LINUX_USER/dadosDB)")
 
 # Diretorio que armazena o backup e diretorio de config do Zabbix
 BKP_DIR="/home/$LINUX_USER/backup"
-# CONF_DIR="/etc/zabbix /usr/lib/zabbix"
+# CONF_DIR="/etc/$DB_NAME /usr/lib/$DB_NAME"
 
 echo "Diretorio de backup: $BKP_DIR"
 
@@ -42,46 +42,48 @@ echo "##########################################################################
 echo "Iniciando DUMP DO SCHEMA"
 
 # Dump da estrutura (Schema) e joga na pasta de backup
-docker exec mysql-server /usr/bin/mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
-    --skip-set-charset --default-character-set=utf8 \
-    >$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql 2>$BKP_DIR/ERROR_LOG
+#docker exec mysql-server /usr/bin/mysqldump --no-data --single-transaction -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+#--skip-set-charset --default-character-set=utf8 \
+#>$BKP_DIR/bkp_$DB_NAME-schema-$DATA.sql 2>$BKP_DIR/ERROR_LOG
 
 echo "###########################################################################################"
+
 echo ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
 echo "Iniciando DUMP DOS DADOS"
 
 # Dump dos dados no banco de dados e joga na pasta de backup
 # Manual: https://mariadb.com/kb/en/mysqldump/
 
-docker exec mysql-server bash -c /usr/bin/mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" --single-transaction --skip-lock-tables --routines --triggers --no-create-info --no-create-db \
-    --skip-set-charset --default-character-set=utf8 \
-    --ignore-table="$DB_NAME.acknowledges" \
-    --ignore-table="$DB_NAME.alerts" \
-    --ignore-table="$DB_NAME.auditlog" \
-    --ignore-table="$DB_NAME.auditlog_details" \
-    --ignore-table="$DB_NAME.event_recovery" \
-    --ignore-table="$DB_NAME.event_suppress" \
-    --ignore-table="$DB_NAME.event_tag" \
-    --ignore-table="$DB_NAME.events" \
-    --ignore-table="$DB_NAME.history" \
-    --ignore-table="$DB_NAME.history_log" \
-    --ignore-table="$DB_NAME.history_str" \
-    --ignore-table="$DB_NAME.history_str_sync" \
-    --ignore-table="$DB_NAME.history_sync" \
-    --ignore-table="$DB_NAME.history_text" \
-    --ignore-table="$DB_NAME.history_uint" \
-    --ignore-table="$DB_NAME.history_uint_sync" \
-    --ignore-table="$DB_NAME.problem" \
-    --ignore-table="$DB_NAME.problem_tag" \
-    --ignore-table="$DB_NAME.task" \
-    --ignore-table="$DB_NAME.task_acknowledge" \
-    --ignore-table="$DB_NAME.task_check_now" \
-    --ignore-table="$DB_NAME.task_close_problem" \
-    --ignore-table="$DB_NAME.task_remote_command" \
-    --ignore-table="$DB_NAME.task_remote_command_result" \
-    --ignore-table="$DB_NAME.trends" \
-    --ignore-table="$DB_NAME.trends_uint" \
-    >$BKP_DIR/bkp_$DB_NAME-$DATA.sql 2>$BKP_DIR/ERROR_LOG
+docker exec mysql-server /usr/bin/mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+        --single-transaction --skip-lock-tables --routines --triggers --no-create-info --no-create-db \
+        --skip-set-charset --default-character-set=utf8 \
+        --ignore-table="$DB_NAME.acknowledges" \
+        --ignore-table="$DB_NAME.alerts" \
+        --ignore-table="$DB_NAME.auditlog" \
+        --ignore-table="$DB_NAME.auditlog_details" \
+        --ignore-table="$DB_NAME.event_recovery" \
+        --ignore-table="$DB_NAME.event_suppress" \
+        --ignore-table="$DB_NAME.event_tag" \
+        --ignore-table="$DB_NAME.events" \
+        --ignore-table="$DB_NAME.history" \
+        --ignore-table="$DB_NAME.history_log" \
+        --ignore-table="$DB_NAME.history_str" \
+        --ignore-table="$DB_NAME.history_str_sync" \
+        --ignore-table="$DB_NAME.history_sync" \
+        --ignore-table="$DB_NAME.history_text" \
+        --ignore-table="$DB_NAME.history_uint" \
+        --ignore-table="$DB_NAME.history_uint_sync" \
+        --ignore-table="$DB_NAME.problem" \
+        --ignore-table="$DB_NAME.problem_tag" \
+        --ignore-table="$DB_NAME.task" \
+        --ignore-table="$DB_NAME.task_acknowledge" \
+        --ignore-table="$DB_NAME.task_check_now" \
+        --ignore-table="$DB_NAME.task_close_problem" \
+        --ignore-table="$DB_NAME.task_remote_command" \
+        --ignore-table="$DB_NAME.task_remote_command_result" \
+        --ignore-table="$DB_NAME.trends" \
+        --ignore-table="$DB_NAME.trends_uint" \
+        >$BKP_DIR/bkp_$DB_NAME-$DATA.sql 2>$BKP_DIR/ERROR_LOG
 
 echo ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
 RED='\033[0;31m'
@@ -106,7 +108,7 @@ done
 
 tar -cvf $BKP_DIR/bkp_$DB_NAME-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-$DATA.sql
 tar -cvf $BKP_DIR/bkp_$DB_NAME-schema-$DATA.tar -C $BKP_DIR/ bkp_$DB_NAME-schema-$DATA.sql
-# tar -cvf $BKP_DIR/bkp_zabbix-config-$DATA.tar -C $BKP_DIR/ $CONF_DIR
+# tar -cvf $BKP_DIR/bkp_$DB_NAME-config-$DATA.tar -C $BKP_DIR/ $CONF_DIR
 
 echo -e "${GREEN}Backup concluido!${NC}"
 exit 0
