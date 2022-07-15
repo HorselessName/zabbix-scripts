@@ -8,6 +8,7 @@
 
 # Variaveis - Data, usuario, senha, nome do banco de dados.
 # Deve existir um arquivo dadosDB com os dados do banco
+
 DATA=`date +%Y-%m-%d`
 
 echo "--------------------------------------------------------------------------------------------"
